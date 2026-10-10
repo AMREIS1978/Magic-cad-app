@@ -47,6 +47,8 @@ jobs:
           git add -f downloads/MagicCAD-Survey.apk
           if ! git diff --cached --quiet; then
             git commit -m "Atualizar APK Android para download direto [skip ci]"
+            git fetch origin main
+            git rebase origin/main
             git push origin HEAD:main
           fi
       - name: Criar release opcional
