@@ -27,6 +27,7 @@ jobs:
         run: |
           APK="app/build/outputs/apk/debug/app-debug.apk"
           test -s "$APK"
+          test "$(stat -c%s "$APK")" -gt 100000
           unzip -t "$APK" | tail -n 2
           "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose "$APK"
           "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$APK" | head -n 8
