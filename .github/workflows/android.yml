@@ -27,9 +27,22 @@ jobs:
         with:
           name: MagicCAD-Survey-APK
           path: app/build/outputs/apk/debug/app-debug.apk
-      - name: Publicar APK para descarregamento direto
+      - name: Disponibilizar APK em link fixo
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/debug/app-debug.apk MagicCAD-Survey.apk
-          gh release create "survey-build-${{ github.run_number }}" MagicCAD-Survey.apk --title "MagicCAD Survey Android #${{ github.run_number }}" --notes "Versão de teste Android. Instale o ficheiro APK no telemóvel." --latest
+          mkdir -p downloads
+          cp app/build/outputs/apk/debug/app-debug.apk downloads/MagicCAD-Survey.apk
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -f downloads/MagicCAD-Survey.apk
+          if ! git diff --cached --quiet; then
+            git commit -m "Atualizar APK Android para download direto [skip ci]"
+            git push origin HEAD:main
+          fi
+      - name: Criar release opcional
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "survey-build-${{ github.run_number }}" downloads/MagicCAD-Survey.apk --title "MagicCAD Survey Android #${{ github.run_number }}" --notes "Versão de teste Android." --latest
